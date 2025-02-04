@@ -7,6 +7,7 @@ import companyRoute from "./routes/company_route.js";
 import jobRoute from "./routes/job_route.js"
 import applicationRoute from "./routes/application_route.js"
 import path from "path";
+import helmet from "helmet"
 
 import dotenv from "dotenv";
 dotenv.config({});
@@ -25,6 +26,20 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"], // Blocks everything by default
+        scriptSrc: ["'self'"],  // Allows scripts from the same domain
+        styleSrc: ["'self'"],   // Allows styles from the same domain
+        imgSrc: ["'self'"],     // Allows images from the same domain
+        connectSrc: ["'self'"], // Allows XHR/WebSocket connections from the same domain
+      },
+    },
+  })
+);
+
 // api's
 app.use("/api/v1/user",userRoute)
 app.use("/api/v1/company",companyRoute)
@@ -34,6 +49,10 @@ app.use("/api/v1/application",applicationRoute)
 app.use(express.static(path.join(_dirname,"/frontend/dist")));
 app.get('*',(_,res)=>{
   res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
+});
+
+app.get("/", (req, res) => {
+  res.send("CSP applied successfully!");
 });
 
 
