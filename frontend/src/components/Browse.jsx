@@ -18,7 +18,7 @@ const Browse = () => {
     }
   },[])
   return (
-    <div>
+    <div className="px-3">
       <Navbar />
       <div className="max-w-7xl mx-auto my-8 ">
         <h1 className="font-semibold text-xl my-8 ">

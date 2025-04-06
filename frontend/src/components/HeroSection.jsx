@@ -30,7 +30,7 @@ const HeroSection = () => {
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel non unde
           necessitatibus ad sint?
         </p>
-        <div className="flex w-[40%] shadow-lg border border-gray-200 pl-3 rounded-full items-center gap-4 mx-auto">
+        <div className="flex w-[40%] min-w-[290px] shadow-lg border border-gray-200 pl-3 rounded-full items-center gap-4 mx-auto">
           <input
             type="text"
             placeholder="Find your dream job.."

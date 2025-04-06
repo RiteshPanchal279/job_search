@@ -133,9 +133,12 @@ export const updateProfile = async (req, res) => {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
 
     const file = req.file;
-    // cloudinary will comes here
+    // cloudinary is here
     const fileUri = getDataUri(file);
+    console.log(fileUri)
+
     const cloudResponce = await cloudinary.uploader.upload(fileUri.content);
+    console.log(cloudResponce)
 
     let skillsArray;
     if (skills) {
@@ -157,7 +160,6 @@ export const updateProfile = async (req, res) => {
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
 
-    // resume comes here later ...
     // ------>
     if (cloudResponce) {
       user.profile.resume = cloudResponce.secure_url; //save the cloudinary url
