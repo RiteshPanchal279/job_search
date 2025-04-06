@@ -20,13 +20,12 @@ const CompaniesTable = () => {
   );
   const [filterCompany, setFilterCompany] = useState(companies);
   const navigate = useNavigate();
+
   useEffect(() => {
     const filteredCompany =
-      companies.length >= 0 &&
+      companies.length > 0 &&
       companies.filter((company) => {
-        if (!searchCompanyByText) {
-          return true;
-        }
+        if (!searchCompanyByText) return true;
         return company?.name
           ?.toLowerCase()
           .includes(searchCompanyByText.toLowerCase());
@@ -35,45 +34,60 @@ const CompaniesTable = () => {
   }, [companies, searchCompanyByText]);
 
   return (
-    <div>
+    <div className="w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200 p-4">
       <Table>
-        <TableCaption>A list of your latest registered companies</TableCaption>
+        <TableCaption className="text-sm text-gray-500 mt-2">
+          A list of your latest registered companies
+        </TableCaption>
+
         <TableHeader>
-          <TableRow>
-            <TableHead>Logo</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+          <TableRow className="bg-gray-50 hover:bg-gray-100 transition">
+            <TableHead className="font-semibold text-gray-700">Logo</TableHead>
+            <TableHead className="font-semibold text-gray-700">Name</TableHead>
+            <TableHead className="font-semibold text-gray-700">Date</TableHead>
+            <TableHead className="text-right font-semibold text-gray-700">
+              Action
+            </TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {filterCompany?.map((company) => (
-            <tr key={company._id}>
+            <TableRow
+              key={company._id}
+              className="hover:bg-gray-50 transition-all duration-200"
+            >
               <TableCell>
-                <Avatar>
-                  <AvatarImage src={company.logo} />
+                <Avatar className="w-10 h-10 border">
+                  <AvatarImage src={company.logo} alt={company.name} />
                 </Avatar>
               </TableCell>
-              <TableCell>{company.name}</TableCell>
-              <TableCell>{company.createdAt.split("T")[0]}</TableCell>
-              <TableCell className="text-right cursor-pointer">
+              <TableCell className="font-medium text-gray-800">
+                {company.name}
+              </TableCell>
+              <TableCell className="text-sm text-gray-600">
+                {company.createdAt.split("T")[0]}
+              </TableCell>
+              <TableCell className="text-right">
                 <Popover>
-                  <PopoverTrigger>
-                    <MoreHorizontal></MoreHorizontal>
+                  <PopoverTrigger asChild>
+                    <button className="p-1 rounded hover:bg-gray-100 transition">
+                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                    </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-32">
+                  <PopoverContent className="w-36 p-2">
                     <div
                       onClick={() =>
                         navigate(`/admin/companies/${company._id}`)
                       }
-                      className="flex items-center gap-3"
+                      className="flex items-center gap-2 text-sm text-gray-700 p-2 rounded hover:bg-gray-100 cursor-pointer transition"
                     >
                       <Edit2 className="w-4 h-4" /> <span>Edit</span>
                     </div>
                   </PopoverContent>
                 </Popover>
               </TableCell>
-            </tr>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
