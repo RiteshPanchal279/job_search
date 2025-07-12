@@ -131,20 +131,26 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-
     const file = req.file;
-    // cloudinary is here
-    const fileUri = getDataUri(file);
-    console.log(fileUri)
-
-    const cloudResponce = await cloudinary.uploader.upload(fileUri.content);
-    console.log(cloudResponce)
-
-    let skillsArray;
-    if (skills) {
-      skillsArray = skills.split(",");
+    const userId = req.id;
+  
+    console.log("File received:", file);
+  
+    let cloudResponce = null;
+  
+    if (file) {
+      const fileUri = getDataUri(file);
+      console.log("Generated fileUri:", fileUri);
+  
+      cloudResponce = await cloudinary.uploader.upload(fileUri.content,{
+        access_mode: "public",
+      });
+  
+      console.log("Cloudinary upload response:", cloudResponce);
     }
-    const userId = req.id; //middleware authentication
+  
+    let skillsArray = skills ? skills.split(",") : [];
+  
     let user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({
@@ -152,22 +158,25 @@ export const updateProfile = async (req, res) => {
         success: false,
       });
     }
-
-    // updating data
+  
+    // Ensure profile exists
+    if (!user.profile) user.profile = {};
+  
+    // Update fields
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
-
-    // ------>
+  
     if (cloudResponce) {
-      user.profile.resume = cloudResponce.secure_url; //save the cloudinary url
-      user.profile.resumeOriginalName = file.originalname; //save the OG file name
+      user.profile.resume = cloudResponce.secure_url;
+      user.profile.resumeOriginalName = file.originalname;
     }
-
+  
     await user.save();
-    user = {
+  
+    const updatedUser = {
       _id: user._id,
       fullname: user.fullname,
       email: user.email,
@@ -175,12 +184,20 @@ export const updateProfile = async (req, res) => {
       role: user.role,
       profile: user.profile,
     };
+  
     return res.status(200).json({
       message: "Profile updated successfully",
-      user,
+      user: updatedUser,
       success: true,
     });
+  
   } catch (err) {
-    console.log(err);
+    console.error("Error updating profile:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: err.message,
+    });
   }
+  
 };
